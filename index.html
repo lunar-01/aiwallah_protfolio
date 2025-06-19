@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Jane Doe, a passionate Software Developer specializing in web and mobile applications.">
+    <meta name="keywords" content="software developer, portfolio, JavaScript, React, women in tech">
+    <meta property="og:title" content="Jane Doe - Software Developer Portfolio">
+    <meta property="og:description" content="Explore the projects and skills of Jane Doe, a passionate Software Developer.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80">
+    <meta property="og:url" content="https://your-portfolio-url.com">
+    <title>Jane Doe's Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for chat bubble, chatbot overlay, profile pic, and animations */
+        .chat-bubble {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ec4899; /* Pink */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .chat-bubble:hover {
+            transform: scale(1.1);
+        }
+        .chat-overlay {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 100%;
+            max-width: 360px;
+            height: 500px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        .chat-overlay.open {
+            display: flex;
+        }
+        .chat-header {
+            background-color: #ec4899; /* Pink */
+            color: white;
+            padding: 12px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background-color: #f9fafb;
+        }
+        .chat-footer {
+            padding: 12px;
+            border-top: 1px solid #e5e7eb;
+            background-color: white;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message.user {
+            align-items: flex-end;
+        }
+        .message.ai {
+            align-items: flex-start;
+        }
+        .message-content {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        .message.user .message-content {
+            background-color: #ec4899; /* Pink */
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.ai .message-content {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            border-bottom-left-radius: 4px;
+        }
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        .chat-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+        }
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .project-card:hover::after {
+            opacity: 1;
+        }
+        .skill-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .skill-logo {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            transition: transform 0.3s ease;
+        }
+        .skill-card:hover .skill-logo {
+            transform: scale(1.1);
+        }
+        @media (max-width: 640px) {
+            .chat-overlay {
+                max-width: 100%;
+                right: 0;
+                bottom: 0;
+                border-radius: 0;
+                height: 100%;
+            }
+            .chat-header {
+                border-radius: 0;
+            }
+            .chat-footer {
+                border-radius: 0;
+            }
+            .profile-pic {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        /* Dark theme styles */
+        html.dark {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        html.dark .bg-white {
+            background-color: #374151;
+        }
+        html.dark .bg-gray-100 {
+            background-color: #1f2937;
+        }
+        html.dark .text-gray-600 {
+            color: #d1d5db;
+        }
+        html.dark .text-gray-800 {
+            color: #f9fafb;
+        }
+        html.dark .chat-overlay {
+            background-color: #374151;
+        }
+        html.dark .chat-body {
+            background-color: #1f2937;
+        }
+        html.dark .chat-footer {
+            background-color: #374151;
+            border-top: 1px solid #4b5563;
+        }
+        html.dark .message.ai .message-content {
+            background-color: #4b5563;
+            color: #f9fafb;
+        }
+        html.dark .bg-gray-800 {
+            background-color: #111827;
+        }
+        html.dark .border-gray-300 {
+            border-color: #4b5563;
+        }
+        html.dark .text-pink-600 {
+            color: #f472b6;
+        }
+        html.dark .bg-pink-600 {
+            background-color: #f472b6;
+        }
+        html.dark .hover\:bg-pink-700:hover {
+            background-color: #ec4899;
+        }
+        html.dark .hover\:text-pink-600:hover {
+            color: #f472b6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <!-- Chat Bubble -->
+    <div class="chat-bubble" onclick="toggleChat()" role="button" aria-label="Open chat with Jane Doe">Ask anything about me</div>
+
+    <!-- Chatbot Overlay -->
+    <div class="chat-overlay" id="chatOverlay" role="dialog" aria-label="Chat with Jane Doe">
+        <div class="chat-header">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Profile picture of Jane Doe" class="chat-profile-pic" loading="lazy">
+            <h3 class="text-lg font-semibold flex-1">Chat with Jane Doe</h3>
+            <button onclick="toggleChat()" class="text-white hover:text-gray-200" aria-label="Close chat">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="message ai">
+                <div class="message-content">Hi, I’m Jane Doe! What would you like to know about me?</div>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <div class="flex">
+                <label for="chatInput" class="sr-only">Chat with Jane Doe</label>
+                <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 border-gray-300 rounded-l-md p-2 focus:ring-pink-500 focus:border-pink-500" aria-label="Chat input">
+                <button onclick="sendMessage()" class="bg-pink-600 text-white px-4 py-2 rounded-r-md hover:bg-pink-700" aria-label="Send message">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50" role="navigation" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-pink-600">Jane’s Portfolio</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#home" class="text-gray-600 hover:text-pink-600 px-3 py-2 rounded-md">Home</a>
+                    <a href="#about" class="text-gray-600 hover:text-pink-600 px-3 py-2 rounded-md">About</a>
+                    <a href="#skills" class="text-gray-600 hover:text-pink-600 px-3 py-2 rounded-md">Skills</a>
+                    <a href="#projects" class="text-gray-600 hover:text-pink-600 px-3 py-2 rounded-md">Projects</a>
+                    <a href="#contact" class="text-gray-600 hover:text-pink-600 px-3 py-2 rounded-md">Contact</a>
+                    <button onclick="toggleTheme()" class="text-gray-600 hover:text-pink-600 p-2 rounded-md" aria-label="Toggle dark mode">
+                        <span class="sr-only">Toggle dark mode</span>
+                        <svg id="themeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-600 text-white">
+        <div class="text-center px-4">
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-4">Hi, I'm Jane Doe</h1>
+            <p class="text-lg sm:text-xl mb-6">A passionate Software Developer crafting beautiful and functional apps.</p>
+            <a href="#contact" class="bg-white text-pink-600 px-6 py-3 rounded-full font-semibold hover:bg-pink-100 transition">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8">About Me</h2>
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-6 md:mb-0 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Profile picture of Jane Doe" class="profile-pic" loading="lazy">
+                </div>
+                <div class="md:w-1/2 md:pl-8">
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        I’m Jane Doe, a Software Developer with a love for creating intuitive web and mobile applications. With 5 years of experience in JavaScript, React, and Flutter, I specialize in building user-centric solutions. I’m passionate about empowering others through technology and enjoy yoga, baking, and open-source contributions in my free time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">My Skills</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Skill Card 1 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-1">
+                    <img src="https://cdn.simpleicons.org/javascript/000000" alt="JavaScript logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-1" class="text-xl font-semibold mb-2 text-gray-800">JavaScript</h3>
+                    <p class="text-gray-600">Proficient in ES6+, Node.js, and building dynamic, interactive web applications.</p>
+                </div>
+                <!-- Skill Card 2 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-2">
+                    <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-2" class="text-xl font-semibold mb-2 text-gray-800">React</h3>
+                    <p class="text-gray-600">Experienced in creating reusable components and managing state with Redux and Hooks.</p>
+                </div>
+                <!-- Skill Card 3 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-3">
+                    <img src="https://cdn.simpleicons.org/flutter/02569B" alt="Flutter logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-3" class="text-xl font-semibold mb-2 text-gray-800">Flutter</h3>
+                    <p class="text-gray-600">Skilled in building cross-platform mobile apps with a focus on performance and UI/UX.</p>
+                </div>
+                <!-- Skill Card 4 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-4">
+                    <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-4" class="text-xl font-semibold mb-2 text-gray-800">TypeScript</h3>
+                    <p class="text-gray-600">Strong knowledge of TypeScript for type-safe, scalable, and maintainable codebases.</p>
+                </div>
+                <!-- Skill Card 5 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-5">
+                    <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind CSS logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-5" class="text-xl font-semibold mb-2 text-gray-800">Tailwind CSS</h3>
+                    <p class="text-gray-600">Expertise in rapid UI development with utility-first CSS for responsive designs.</p>
+                </div>
+                <!-- Skill Card 6 -->
+                <div class="skill-card bg-white rounded-lg shadow-md p-6 text-center" role="article" aria-labelledby="skill-title-6">
+                    <img src="https://cdn.simpleicons.org/git/F05032" alt="Git logo" class="skill-logo" loading="lazy">
+                    <h3 id="skill-title-6" class="text-xl font-semibold mb-2 text-gray-800">Git</h3>
+                    <p class="text-gray-600">Proficient in version control, branching, and collaboration using Git and GitHub.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">My Projects</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Project Card 1 -->
+                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" role="article" aria-labelledby="project-title-1">
+                    <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Health Tracker App" class="w-full h-48 object-cover" loading="lazy">
+                    <div class="p-6 project-card-content">
+                        <h3 id="project-title-1" class="text-xl font-semibold mb-2 text-gray-800">Health Tracker App</h3>
+                        <p class="text-gray-600 mb-4">A mobile app for tracking fitness goals, nutrition, and wellness with real-time analytics.</p>
+                        <a href="https://github.com/janedoe/health-tracker" class="text-pink-600 font-semibold hover:underline">View Project</a>
+                    </div>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" role="article" aria-labelledby="project-title-2">
+                    <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Freelance Marketplace" class="w-full h-48 object-cover" loading="lazy">
+                    <div class="p-6 project-card-content">
+                        <h3 id="project-title-2" class="text-xl font-semibold mb-2 text-gray-800">Freelance Marketplace</h3>
+                        <p class="text-gray-600 mb-4">A web platform connecting freelancers with clients, featuring secure payments and chat.</p>
+                        <a href="https://github.com/janedoe/freelance-marketplace" class="text-pink-600 font-semibold hover:underline">View Project</a>
+                    </div>
+                </div>
+                <!-- Project Card 3 -->
+                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden" role="article" aria-labelledby="project-title-3">
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Learning Platform" class="w-full h-48 object-cover" loading="lazy">
+                    <div class="p-6 project-card-content">
+                        <h3 id="project-title-3" class="text-xl font-semibold mb-2 text-gray-800">Learning Platform</h3>
+                        <p class="text-gray-600 mb-4">An e-learning site with interactive courses, quizzes, and progress tracking for students.</p>
+                        <a href="https://github.com/janedoe/learning-platform" class="text-pink-600 font-semibold hover:underline">View Project</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-8">Contact Me</h2>
+            <div class="max-w-lg mx-auto">
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500" aria-label="Name">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500" aria-label="Email">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                        <textarea id="message" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500" aria-label="Message"></textarea>
+                    </div>
+                    <button onclick="submitForm()" class="w-full bg-pink-600 text-white py-2 px-4 rounded-md hover:bg-pink-700 transition" aria-label="Send message">Send Message</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>© 2025 Jane Doe. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Gemini API key (should be moved to backend for security)
+        const GEMINI_API_KEY = 'AIzaSyBH2KbqxPamuTUbyw63GuVLovFeBQ4ltds'; 
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+        // Toggle chat overlay
+        function toggleChat() {
+            const chatOverlay = document.getElementById('chatOverlay');
+            const chatBody = document.getElementById('chatBody');
+            if (!chatOverlay.classList.contains('open')) {
+                chatBody.innerHTML = `
+                    <div class="message ai">
+                        <div class="message-content">Hi, I’m Jane Doe! What would you like to know about me?</div>
+                    </div>
+                `;
+            }
+            chatOverlay.classList.toggle('open');
+        }
+
+        // Send message and call Gemini API
+        async function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatBody = document.getElementById('chatBody');
+            const messageText = chatInput.value.trim();
+            const myDescription = "I’m Jane Doe, a Software Developer with a love for creating intuitive web and mobile applications. With 5 years of experience in JavaScript, React, and Flutter, I specialize in building user-centric solutions. I’m passionate about empowering others through technology and enjoy yoga, baking, and open-source contributions in my free time.";
+
+            if (messageText) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `<div class="message-content">${messageText}</div>`;
+                chatBody.appendChild(userMessage);
+
+                // Call Gemini API
+                try {
+                    const response = await fetch(GEMINI_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: `User_message:${messageText}. Reply naturally to the usermessage and if required then answer based on: ${myDescription} or just simply give friendly reply. Reply in a way that Jane Doe is herself talking. Reply in short sentences.`
+                                }]
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('API request failed');
+
+                    const data = await response.json();
+                    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I couldn’t process that. Try again!';
+
+                    // Add AI response
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai';
+                    aiMessage.innerHTML = `<div class="message-content">${aiResponse}</div>`;
+                    chatBody.appendChild(aiMessage);
+                } catch (error) {
+                    console.error('API Error:', error);
+                    const aiResponse = messageText.toLowerCase().includes('skill') || messageText.toLowerCase().includes('experience') || messageText.toLowerCase().includes('project') || messageText.toLowerCase().includes('hob')
+                        ? `Hi! I’m Jane Doe. I specialize in JavaScript, React, and Flutter. I have 5 years of experience building apps. I love yoga, baking, and contributing to open-source. Want to know more?`
+                        : `Hey, I’m Jane Doe. That’s a great question! I’m happy to chat about anything. What’s next?`;
+
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai';
+                    aiMessage.innerHTML = `<div class="message-content">${aiResponse}</div>`;
+                    chatBody.appendChild(aiMessage);
+                }
+
+                // Clear input and scroll to bottom
+                chatInput.value = '';
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+
+        // Handle Enter key for sending message
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Toggle dark/light theme
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            if (html.classList.contains('light')) {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+            }
+        }
+
+        // Form submission placeholder
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            if (name && email && message) {
+                alert("Message sent successfully!");
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('message').value = '';
+            } else {
+                alert("Please fill out all fields.");
+            }
+        }
+    </script>
+</body>
+</html>
